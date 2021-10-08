@@ -4,33 +4,40 @@ import createError from 'http-errors';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-async function getAuction(event, context) {
-  let auction;
+async function placeBid(event, context) {
   const { id } = event.pathParameters;
+  const { amount } = event.body;
 
   const params = {
     TableName: process.env.AUCTIONS_TABLE_NAME,
     Key: { id },
+    UpdateExpression: 'set highestBid.amount = :amount',
+    ExpressionAttributeValues: {
+      ':amount': amount,
+    },
+    ReturnValues: 'ALL_NEW',
   };
 
+  let updateAuction;
+
   try {
-    const result = await dynamodb.get(params).promise();
-    auction = result.Item;
+    const result = await dynamodb.update(params).promise();
+    updateAuction = result.Attributes;
   } catch(error) {
     console.error(error);
     throw new createError.InternalServerError(error);
   }
 
-  if (!auction) {
+  if (!updateAuction) {
     throw new createError.NotFound(`Auction with ID "${id} not found"`);
   }
 
   return {
     statusCode: 200,
-    body: JSON.stringify(auction),
+    body: JSON.stringify(updateAuction),
   };
 }
 
-export const handler = commonMiddleware(getAuction)
+export const handler = commonMiddleware(placeBid)
 
 

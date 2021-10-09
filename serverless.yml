@@ -27,6 +27,7 @@ functions:
       - http:
           method: POST
           path: /auction
+          cors: true
           authorizer: ${self:custom.authorizer}
   getAuctions:
     handler: src/handlers/getAuctions.handler
@@ -34,6 +35,7 @@ functions:
       - http:
           method: GET
           path: /auctions
+          cors: true
           authorizer: ${self:custom.authorizer}
   getAuction:
     handler: src/handlers/getAuction.handler
@@ -41,6 +43,7 @@ functions:
       - http:
           method: GET
           path: /auction/{id}
+          cors: true
           authorizer: ${self:custom.authorizer}
   placeBid:
     handler: src/handlers/placeBid.handler
@@ -48,6 +51,7 @@ functions:
       - http:
           method: PATCH
           path: auction/{id}/bid
+          cors: true
           authorizer: ${self:custom.authorizer}
 
   processAuctions:
